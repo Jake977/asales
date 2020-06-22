@@ -1,9 +1,7 @@
 import React from 'react';
-import * as rax from 'retry-axios';
-import axios from 'axios';
 import styled, { createGlobalStyle } from 'styled-components';
 import * as ReactDOM from 'react-dom';
-
+import TicketService from '../../services/TicketService/TicketService';
 import TransferFlightsFilter from '../TransferFlightsFilter/TransferFlightsFilter';
 import FilterButtons from '../FilterButtons/FilterButtons';
 import TicketsList from '../TicketsList/TicketsList';
@@ -50,52 +48,43 @@ const ColRight = styled.div`
   flex-direction: column;
 `;
 
-rax.attach();
-
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.sortVariants = {
+      PRICE: 'PRICE',
+      DURATION: 'DURATION',
+    };
     this.state = {
       isAllLoaded: false,
       tickets: [],
-      sortBy: 'price', // duration
+      sortBy: this.sortVariants.PRICE,
       filters: {
-        0: true,
-        1: true,
-        2: true,
-        3: true,
+        noTransfer: true,
+        oneTransfer: true,
+        twoTransfers: true,
+        threeTransfers: true,
       },
     };
-    this.serviceURL = 'https://front-test.beta.aviasales.ru';
     this.ticketsNumInList = 5;
   }
 
   async componentDidMount() {
+    this.service = new TicketService();
     try {
-      const { data } = await axios.get(`${this.serviceURL}/search`);
-      await this.recursiveFetch(data.searchId);
+      const SearchId = await this.service.getSearchId();
+      await this.service.recursiveFetch(SearchId, this.onLoadStateUpdate);
     } catch (error) {
       return error;
     }
+    return null;
   }
 
-  recursiveFetch = async (searchId) => {
-    try {
-      const { data } = await axios.get(`${this.serviceURL}/tickets?searchId=${searchId}`);
-      const chunkData = data.tickets;
-      const isStop = data.stop;
-
-      this.setState((prevState) => ({
-        isAllLoaded: isStop,
-        tickets: [...prevState.tickets, ...chunkData],
-      }));
-
-      if (!isStop) {
-        await this.recursiveFetch(searchId);
-      }
-    } catch (error) {
-      return error;
-    }
+  onLoadStateUpdate = (chunkData, isStop) => {
+    this.setState((prevState) => ({
+      isAllLoaded: isStop,
+      tickets: [...prevState.tickets, ...chunkData],
+    }));
   };
 
   onFilterChange = (value) => {
@@ -113,7 +102,7 @@ class App extends React.Component {
   };
 
   onSortByChange = (value) => {
-    this.setState({ sortBy: value });
+    this.setState({ sortBy: this.sortVariants[value] });
   };
 
   render() {
@@ -140,12 +129,14 @@ class App extends React.Component {
             <FilterButtons
               onChange={this.onSortByChange}
               sortBy={sortBy}
+              sortVariants={this.sortVariants}
             />
             <TicketsList
               isAllLoaded={isAllLoaded}
               tickets={tickets}
               filters={filters}
               sortBy={sortBy}
+              sortVariants={this.sortVariants}
               ticketsNumInList={this.ticketsNumInList}
             />
           </ColRight>

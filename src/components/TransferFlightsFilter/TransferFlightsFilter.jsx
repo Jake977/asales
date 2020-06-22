@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import * as PropTypes from 'prop-types';
 import CustomCheckBox from '../CustomCheckbox/CustomCheckbox';
 
-
 const TransferFilterBlock = styled.form`
   background: #FFFFFF;
   min-width: 232px;
@@ -62,32 +61,32 @@ const TransferFlightsFilter = ({ onChange, filters }) => {
       <Label key="noTransfer">
         <CustomCheckBox
           name="transfer"
-          checked={filters[0]}
-          onChange={() => onChange('0')}
+          checked={filters.noTransfer}
+          onChange={() => onChange('noTransfer')}
         />
         Без пересадок
       </Label>
       <Label key="oneTransfer">
         <CustomCheckBox
           name="transfer"
-          checked={filters[1]}
-          onChange={() => onChange('1')}
+          checked={filters.oneTransfer}
+          onChange={() => onChange('oneTransfer')}
         />
         1 пересадка
       </Label>
       <Label key="twoTransfer">
         <CustomCheckBox
           name="transfer"
-          checked={filters[2]}
-          onChange={() => onChange('2')}
+          checked={filters.twoTransfers}
+          onChange={() => onChange('twoTransfers')}
         />
         2 пересадки
       </Label>
       <Label key="threeTransfer">
         <CustomCheckBox
           name="transfer"
-          checked={filters[3]}
-          onChange={() => onChange('3')}
+          checked={filters.threeTransfers}
+          onChange={() => onChange('threeTransfers')}
         />
         3 пересадки
       </Label>

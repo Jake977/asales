@@ -2,14 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import * as PropTypes from 'prop-types';
 import Ticket from '../Ticket/Ticket';
+import '../../css/loadspiner.css';
 
-const Loading = styled.div`
-  width: 502px;
-  height: 50px;
-  text-align: center;
-`;
-
-const EmptyResult = styled.div`
+const PlaceHolder = styled.div`
   width: 502px;
   height: 50px;
   text-align: center;
@@ -18,29 +13,32 @@ const EmptyResult = styled.div`
 class Tickets extends React.Component {
   applyTicketFilters = (tickets) => {
     const { filters } = this.props;
-    const enabledFilters = Object.keys(filters).filter((filterKey) => filters[filterKey]);
+    const enabledFiltersArray = Object.values(filters)
+      .map((elem, index) => ((elem === true) ? index : ''))
+      .filter((elem) => elem === 0 || elem);
     return tickets.filter((ticket) => {
       const { segments } = ticket;
       const maxStops = segments.reduce((acc, segment) => (
         acc < segment.stops.length ? segment.stops.length : acc
       ), 0);
-      return enabledFilters.includes(maxStops.toString());
+      return enabledFiltersArray.includes(maxStops);
     });
   };
 
   getFlightDuration = ({ segments }) => segments.reduce((acc, { duration }) => (acc + duration), 0);
 
   doSortTickets = (tickets) => {
-    const { sortBy } = this.props;
+    const { sortBy, sortVariants } = this.props;
     return tickets.sort((ticketA, ticketB) => {
-      if (sortBy === 'price') {
+      if (sortBy === sortVariants.PRICE) {
         return ticketA.price - ticketB.price;
       }
-      if (sortBy === 'duration') {
+      if (sortBy === sortVariants.DURATION) {
         const durationA = this.getFlightDuration(ticketA);
         const durationB = this.getFlightDuration(ticketB);
         return durationA - durationB;
       }
+      return null;
     });
   };
 
@@ -62,9 +60,18 @@ class Tickets extends React.Component {
           className="ticket"
         />
       );
-    }) : <EmptyResult>Ничего не найдено</EmptyResult>;
+    }) : <PlaceHolder>Ничего не найдено</PlaceHolder>;
 
-    const loadingMessage = <Loading>Loading...</Loading>;
+    const loadingMessage = (
+      <PlaceHolder>
+        Loading
+        <div className="spinner">
+          <div className="bounce1" />
+          <div className="bounce2" />
+          <div className="bounce3" />
+        </div>
+      </PlaceHolder>
+    );
     return isAllLoaded ? ticketsList : loadingMessage;
   }
 }
@@ -75,6 +82,7 @@ Tickets.propTypes = {
   tickets: PropTypes.arrayOf(PropTypes.object).isRequired,
   sortBy: PropTypes.string.isRequired,
   isAllLoaded: PropTypes.bool.isRequired,
+  sortVariants: PropTypes.objectOf(PropTypes.string).isRequired,
 };
 
 export default Tickets;

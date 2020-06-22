@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import * as PropTypes from 'prop-types';
-import Segment from '../Segment/Segment';
+import Segment from './Segment/Segment';
 
 const TicketView = styled.div`
   background: #FFF;

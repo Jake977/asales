@@ -2,7 +2,7 @@
   "name": "asales",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://jake977.github.io/aviasales20",
+  "homepage": "https://jake977.github.io/asales",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
